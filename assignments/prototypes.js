@@ -144,6 +144,7 @@ zs
   // * Create two new objects, one a villain and one a hero and fight it out with methods!
 
   //----------------gameobject
+//----------------gameobject
 function GameObject(attributes) {
   this.createdAt = attributes.createdAt;
   this.name = attributes.name;
@@ -157,9 +158,11 @@ GameObject.prototype.destroy = function() {
   }
 
 //-----------characterstats
+CharacterStats.prototype = Object.create(GameObject.prototype);
+
 function CharacterStats(attributes) {
   GameObject.call(this, attributes);
-  this.healthPoints = attributes.healthPoints
+  this.healthPoints = attributes.healthPoints;
 }
 
 
@@ -168,12 +171,12 @@ CharacterStats.prototype.takeDamage = function() {
   return `${this.name} took damage`; 
 }
 
-CharacterStats.prototype = Object.create(GameObject.prototype);
+
 
 //---------humanoid
+Humanoid.prototype = Object.create(CharacterStats.prototype);
 function Humanoid(attributes) {
   CharacterStats.call(this, attributes);
-  GameObject.call(this,attributes);
   this.team = attributes.team; 
   this.weapons = attributes.weapons;
   this.language = attributes.language; 
@@ -181,7 +184,6 @@ function Humanoid(attributes) {
   this.attack = attributes.attack;
   this.strength = attributes.strength;
   this.defense = attributes.defense; 
-  this.opponent = attributes.opponent;
   
 }
 
@@ -192,54 +194,55 @@ Humanoid.prototype.greet = function () {
 }
 
 Humanoid.prototype.damage = function() {
-  return `${this.name} health = ${this.healthpoints}`;
+  return `${this.name} health = ${this.healthPoints}`;
 }
 
 
-Humanoid.prototype = Object.create(CharacterStats.prototype);
+
 
 //-----------Villain
+Villain.prototype = Object.create(Humanoid.prototype);
 
 function Villain(attributes) {
-  GameObject.call(this, attributes);
-  CharacterStats.call(this, attributes);
   Humanoid.call(this, attributes);
   
   this.damagePts = attributes.damagePts; 
   this.extraAttack = attributes.extraAttack;
+  this.opponent = attributes.opponent;
 }
 
-Villain.prototype = Object.create(Humanoid.prototype);
 //method
 
-Villain.prototype.attack = function () {
-  return `${this.name} attacks ${opponent} with ${weapons} and deals out ${this.damagePts} with additional damage of ${this.extraAttack}`;
-  this.opponent.healthpoints -= (this.damage + this.extraAttack); 
+Villain.prototype.attacking = function () {
+    this.opponent.healthPoints -= (this.damagePts + this.extraAttack); 
+  return `${this.name} attacks ${this.opponent.name} with ${this.weapons} and deals out ${this.damagePts} damange with additional damage of ${this.extraAttack}`;
 }
 
 
 //-----------Hero
+
+Hero.prototype = Object.create(Humanoid.prototype);
+
+
 function Hero(attributes) {
-  GameObject.call(this, attributes);
-  CharacterStats.call(this, attributes);
   Humanoid.call(this, attributes);
   
   this.damagePts = attributes.damagePts; 
   this.counterstrikePts = attributes.counterstrikePts;
+  this.opponent = attributes.opponent;
 }
 
-//Hero.prototype = Object.create(Humanoid.prototype);
 
 //method
 
 Hero.prototype.counterstrike = function () {
+  this.opponent.healthPoints -= this.counterstrikePts;
   return `${this.name} counterstrikes for ${this.counterstrikePts} damage`;
-  this.opponent.healthpoints -= this.counterstrikePts;
 }
 
-Hero.prototype.attack = function () {
-  return `${this.name} attacks ${this.opponent} with ${this.weapons} and deals out ${this.damagePts}`;
-  this.opponent.healthpoints -= this.damage; 
+Hero.prototype.attacking = function () {
+  this.opponent.healthPoints -= this.damagePts;
+  return `${this.name} attacks ${this.opponent.name} with ${this.weapons} and deals out ${this.damagePts} damage`;
 }
 
 
@@ -295,7 +298,7 @@ Hero.prototype.attack = function () {
   });
 
   const hobbit = new Hero({
-    healthPoints: 15,
+    healthPoints: 20,
     name: 'Frodo',
     counterstrikePts: 2,
     weapons: ['stick'],
@@ -306,25 +309,32 @@ Hero.prototype.attack = function () {
     healthPoints: 11,
     name: 'Saruman',
     extraAttack: 3,
+    weapons: ['staff'],
     opponent: hobbit, 
     damagePts: 2,
   });
 
-  hobbit.opponent= wizard; 
-  console.log(mage.createdAt); // Today's date
-  console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
-  console.log(swordsman.healthPoints); // 15
-  console.log(mage.name); // Bruce
-  console.log(swordsman.team); // The Round Table
-  console.log(mage.weapons); // Staff of Shamalama
-  console.log(archer.language); // Elvish
-  console.log(archer.greet()); // Lilith offers a greeting in Elvish.
-  console.log(mage.takeDamage()); // Bruce took damage.
-  console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
-console.log(hobbit.name);
-console.log(hobbit.opponent.name);
+  hobbit.opponent = wizard; 
+  // console.log(mage.createdAt); // Today's date
+  // console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
+  // console.log(swordsman.healthPoints); // 15
+  // console.log(mage.name); // Bruce
+  // console.log(swordsman.team); // The Round Table
+  // console.log(mage.weapons); // Staff of Shamalama
+  // console.log(archer.language); // Elvish
+  // console.log(archer.greet()); // Lilith offers a greeting in Elvish.
+  // console.log(mage.takeDamage()); // Bruce took damage.
+  // console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
+console.log(hobbit.damage());
+console.log(wizard.damage());
+console.log(hobbit.attacking());
+console.log(wizard.damage());
+console.log(wizard.attacking());
+console.log(hobbit.damage());
 console.log(hobbit.counterstrike());
-console.log(wizard.name);
+console.log(wizard.damage());
+
+
 
 
   // Stretch task: 
